@@ -1,0 +1,40 @@
+﻿@page "/getteams"
+@inject ITeamServiceClient teamServiceClient
+
+<h1>All teams</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (teams == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in teams)
+            {
+                <tr>
+                    <td>@t.ID</td>
+                    <td>@t.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@functions {
+    IEnumerable<Team> teams;
+
+    protected override async Task OnInitAsync()
+    {
+        teams = await teamServiceClient.GetAllAsync();
+    }
+}
