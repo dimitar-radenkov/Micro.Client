@@ -1,4 +1,5 @@
 ﻿@page "/getteams"
+@inject IToaster toaster
 @inject ITeamServiceClient teamServiceClient
 
 <h1>All teams</h1>
@@ -16,6 +17,7 @@ else
             <tr>
                 <th>Id</th>
                 <th>Name</th>
+                <th>></th>
             </tr>
         </thead>
         <tbody>
@@ -24,6 +26,11 @@ else
                 <tr>
                     <td>@t.ID</td>
                     <td>@t.Name</td>
+                    <th>
+                        <button class="btn btn-danger" onclick=@(() => OnButtonDeleteClicked(t.ID))>
+                            Delete
+                        </button>
+                    </th>
                 </tr>
             }
         </tbody>
@@ -35,6 +42,26 @@ else
 
     protected override async Task OnInitAsync()
     {
+        await this.RefreshAsync();
+    }
+
+    protected async Task OnButtonDeleteClicked(Guid teamId)
+    {
+        var success = await this.teamServiceClient.DeleteAsync(teamId);
+        if (success)
+        {
+            toaster.Success("Team deleted successfully");
+            await this.RefreshAsync();
+        }
+        else
+        {
+            this.toaster.Error("Failed to delete team...");
+        }
+    }
+
+    private async Task RefreshAsync()
+    {
         teams = await teamServiceClient.GetAllAsync();
     }
+
 }

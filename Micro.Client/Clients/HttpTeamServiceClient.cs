@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Micro.Client.Models;
-using Newtonsoft.Json;
+using Microsoft.AspNetCore.Blazor;
 
 namespace Micro.Client.Clients
 {
@@ -10,20 +11,37 @@ namespace Micro.Client.Clients
     {
         private const string URL = "https://localhost:44394/api/teams";
 
-        public async Task<IEnumerable<Team>> GetAllAsync()
+        public async Task<Team> CreateAsync(string name)
         {
             using (var httpClient = new HttpClient())
             {
-                var response = await httpClient.GetAsync(URL);
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var teams = JsonConvert.DeserializeObject<IEnumerable<Team>>(content);
-                    return teams;
-                }
+                var created = await httpClient.PostJsonAsync<Team>(URL, name);
+                Console.WriteLine(created);
+                return created;
             }
+        }
 
-            return new List<Team>();
+        public async Task<bool> DeleteAsync(Guid teamId)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                var responseMessage = await httpClient.DeleteAsync($"{URL}/{teamId}");
+                if (responseMessage.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        public async Task<IEnumerable<Team>> GetAllAsync()
+        {
+            using (var httpClient = new HttpClient())
+            {               
+                var response = await httpClient.GetJsonAsync<IEnumerable<Team>>(URL);
+                return response;
+            }
         }
     }
 }

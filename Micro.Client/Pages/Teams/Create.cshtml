@@ -1,0 +1,47 @@
+﻿@page "/teams/create"
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper uriHelper
+@inject IToaster toaster
+@inject ITeamServiceClient teamService
+
+<div class="form-group">
+    <label for="name">Name</label>
+    <input type="text" class="form-control" id="name" oninput="@OnValueChanged" onkeyup="@DetectEnterKey" />
+</div>
+<div class="form-group">
+    <input type="submit" class="btn btn-default" disabled="@isButtonDisabled" value="Create" onclick="@OnButtonAddClicked" />
+</div>
+
+@functions {
+
+    private string name = "";
+    private bool isButtonDisabled = true;
+
+    private void DetectEnterKey(UIKeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            this.OnButtonAddClicked().GetAwaiter();
+        }
+    }
+
+    private void OnValueChanged(UIChangeEventArgs e)
+    {
+        this.name = e.Value as string;
+        this.isButtonDisabled = string.IsNullOrEmpty(this.name);
+    }
+
+    private async Task OnButtonAddClicked()
+    {
+        var result = await this.teamService.CreateAsync(this.name);
+        Console.WriteLine(result);
+        if (result != null)
+        {
+            this.toaster.Success("Team created successfully");
+            uriHelper.NavigateTo("/getteams");
+        }
+        else
+        {
+            this.toaster.Error("Failed to create team...");
+        }
+    }
+}
