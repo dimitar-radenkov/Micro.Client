@@ -1,4 +1,5 @@
-﻿@page "/getteams"
+﻿@page "/teams/getall"
+@inject IUriHelper uriHelper
 @inject IToaster toaster
 @inject ITeamServiceClient teamServiceClient
 
@@ -18,6 +19,7 @@ else
                 <th>Id</th>
                 <th>Name</th>
                 <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -27,7 +29,10 @@ else
                     <td>@t.ID</td>
                     <td>@t.Name</td>
                     <th>
-                        <button class="btn btn-danger" onclick=@(() => OnButtonDeleteClicked(t.ID))>
+                        <button class="btn btn-warning" onclick="@(() => OnButtonEditClicked(t.ID))">Edit</button>
+                    </th>
+                    <th>
+                        <button class="btn btn-danger" onclick=@(async () => await OnButtonDeleteClicked(t.ID))>
                             Delete
                         </button>
                     </th>
@@ -43,6 +48,11 @@ else
     protected override async Task OnInitAsync()
     {
         await this.RefreshAsync();
+    }
+
+    private void OnButtonEditClicked(Guid teamId)
+    {
+        this.uriHelper.NavigateTo($"/teams/edit/{teamId}");
     }
 
     protected async Task OnButtonDeleteClicked(Guid teamId)
@@ -63,5 +73,4 @@ else
     {
         teams = await teamServiceClient.GetAllAsync();
     }
-
 }

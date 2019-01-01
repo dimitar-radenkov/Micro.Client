@@ -1,7 +1,9 @@
-﻿@page "/teams/create"
+﻿@page "/teams/edit/{TeamId}"
 @inject IUriHelper uriHelper
 @inject IToaster toaster
 @inject ITeamServiceClient teamService
+
+<h1>Edit</h1>
 
 <div class="form-group">
     <label for="name">Name</label>
@@ -13,8 +15,17 @@
 
 @functions {
 
+    [Parameter]
+    protected string TeamId { get; set; }
+
     private string name = "";
     private bool isButtonDisabled = true;
+
+    protected override void OnInit()
+    {
+        Console.WriteLine(this.TeamId);
+    }
+
 
     private void DetectEnterKey(UIKeyboardEventArgs e)
     {
